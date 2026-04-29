@@ -1,5 +1,6 @@
 package br.senac.sp.gamesfx;
 
+import br.senac.sp.gamesfx.ui.home.PainelHome;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -21,7 +22,7 @@ public class TelaPrincipal extends Application {
         VBox painelLateral = new VBox();
         painelLateral.setSpacing(10);
         painelLateral.setPrefWidth(200);
-        painelLateral.setStyle("-fx-background-color: #6d80b6");
+        painelLateral.setStyle("-fx-background-color: #6d80b6; -fx-border-color: #000000; -fx-border-width: 3");
         raiz.setStyle("-fx-background-color: #8aa1ca");
         painelLateral.setPadding(new Insets(10));
         Button btnJogos = criarBotaoMenu("Jogos");
@@ -38,6 +39,10 @@ public class TelaPrincipal extends Application {
         );
 
         raiz.setLeft(painelLateral);
+
+        PainelHome painelHome = new PainelHome();
+
+        raiz.setCenter(painelHome.criarPainelHome());
 
         Scene cena = new Scene(raiz, 900, 700);
         stage.setScene(cena);
