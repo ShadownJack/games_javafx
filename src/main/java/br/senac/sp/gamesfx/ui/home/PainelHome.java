@@ -65,6 +65,7 @@ public class PainelHome {
             lblTituloTelefone.setStyle(COR_PADRAO);
             lblTelefone.setStyle(COR_SECUNDARIA);
 
+            //Texto
             Label lblTextoFinal = new Label("Desenvolvido por GameSky© - 2026");
             lblTextoFinal.setStyle(COR_PADRAO);
 

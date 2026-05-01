@@ -1,6 +1,7 @@
 package br.senac.sp.gamesfx;
 
 import br.senac.sp.gamesfx.ui.home.PainelHome;
+import br.senac.sp.gamesfx.ui.jogos.PainelJogos;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -26,9 +27,18 @@ public class TelaPrincipal extends Application {
         raiz.setStyle("-fx-background-color: #8aa1ca");
         painelLateral.setPadding(new Insets(10));
         Button btnJogos = criarBotaoMenu("Jogos");
+        btnJogos.setOnAction(click -> {
+            PainelJogos painelJogos = new PainelJogos();
+            raiz.setCenter(painelJogos.criarPainelJogos());
+        } );
+
         Button btnPlataformas = criarBotaoMenu("Plataforma");
         Button btnEstudio = criarBotaoMenu("Estudios");
         Button  btnHome = criarBotaoMenu("Home");
+        btnHome.setOnAction(click ->{
+            PainelHome painelHome = new PainelHome();
+            raiz.setCenter(painelHome.criarPainelHome());
+        } );
 
         aplicarEfeitoHover(btnHome, btnJogos, btnPlataformas, btnEstudio);
         painelLateral.getChildren().addAll(
