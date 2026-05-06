@@ -26,6 +26,8 @@ public class TelaPrincipal extends Application {
         painelLateral.setStyle("-fx-background-color: #6d80b6; -fx-border-color: #000000; -fx-border-width: 3");
         raiz.setStyle("-fx-background-color: #8aa1ca");
         painelLateral.setPadding(new Insets(10));
+
+        // Botão PainelJogos
         Button btnJogos = criarBotaoMenu("Jogos");
         btnJogos.setOnAction(click -> {
             PainelJogos painelJogos = new PainelJogos();
@@ -35,6 +37,8 @@ public class TelaPrincipal extends Application {
         Button btnPlataformas = criarBotaoMenu("Plataforma");
         Button btnEstudio = criarBotaoMenu("Estudios");
         Button  btnHome = criarBotaoMenu("Home");
+
+        // Botão PainelHome
         btnHome.setOnAction(click ->{
             PainelHome painelHome = new PainelHome();
             raiz.setCenter(painelHome.criarPainelHome());
@@ -56,7 +60,6 @@ public class TelaPrincipal extends Application {
 
         Scene cena = new Scene(raiz, 900, 700);
         stage.setScene(cena);
-//        stage.setResizable(false);
         stage.setTitle("Sistema de Gestão de Jogos V1.0");
         stage.setMaximized(true);
         stage.getIcons().add(imagem);
