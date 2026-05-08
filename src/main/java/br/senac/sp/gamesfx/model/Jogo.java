@@ -25,6 +25,9 @@ public class Jogo {
     private LocalDate dataLancamento;
     private boolean finalizado;
 
+    public String getFinalizadoFormatado() {
+        return this.finalizado ? "Sim" : "Não";
+    }
 
     public int getId() {
         return id;
