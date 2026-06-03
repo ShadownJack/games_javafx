@@ -5,6 +5,9 @@ import java.util.Date;
 
 public class Jogo {
 
+    public Jogo() {
+    }
+
     public Jogo(int id, String titulo, String plataforma, String categoria, String estudio, double preco, boolean finalizado, LocalDate dataLancamento) {
         this.id = id;
         this.titulo = titulo;
