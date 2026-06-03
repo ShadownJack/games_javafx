@@ -6,18 +6,33 @@ import java.sql.SQLException;
 
 public class ConexaoSQLite {
 
-    public static Connection getConexaoSQLite() {
-        // String de conexão - URL do banco de dados
-        String url = "jdbc:sqlite:/C:\\Users\\david.sribeiro4\\OneDrive - SENAC - SP\\banco_de_dados\\db_games";
+    private static Connection conexao;
+
+    public static Connection getConexao() {
+        // Mantido o seu caminho de banco de dados
+        String url = "jdbc:sqlite:C:/Users/david.sribeiro4/banco_de_dados/db_games.db";
 
         try {
-            Connection conexao = DriverManager.getConnection(url);
+            conexao = DriverManager.getConnection(url);
+            System.out.println("Conexão REALIZADA COM SUCESSO!");
             return conexao;
-        }catch (SQLException erro){
+        } catch (SQLException erro) {
             System.out.println("Ocorreu um erro durante a conexão com o banco.");
             erro.printStackTrace();
             return null;
         }
     }
 
+    // Atualizado com a lógica limpa e correta do professor
+    public static void fecharConexao() {
+        try {
+            // ADICIONADO/CORRIGIDO: Verifica se existe uma conexão ativa antes de tentar fechar
+            if (conexao != null && !conexao.isClosed()) {
+                conexao.close();
+            }
+        } catch (SQLException e) {
+            // ADICIONADO DO PROFESSOR: Apenas imprime o rastro do erro sem estourar um RuntimeException
+            e.printStackTrace();
+        }
+    }
 }

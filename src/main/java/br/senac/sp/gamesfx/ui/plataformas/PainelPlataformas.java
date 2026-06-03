@@ -75,14 +75,14 @@ public class PainelPlataformas {
         painelBotoes.setPadding(new Insets(20, 0, 0, 0));
         painelBotoes.setAlignment(Pos.BASELINE_RIGHT);
 
-        Button btnAdicionar = criarBotao("Adicionar", "/imagens/add16.png");
+        Button btnAdicionar = criarBotao("Adicionar", "/imagens/save-game.png");
         btnAdicionar.setOnAction(e -> {
             TelaPlataforma telaPlataforma = new TelaPlataforma();
             telaPlataforma.criarTela(stage);
             tabelaPlataformas.setItems(repository.getPlataformas());
         });
 
-        Button btnEditar = criarBotao("Editar", "/imagens/edit16.png");
+        Button btnEditar = criarBotao("Editar", "/imagens/pencil.png");
         btnEditar.setOnAction(e -> {
             Plataforma plataformaEditar = tabelaPlataformas.getSelectionModel().getSelectedItem();
             if (plataformaEditar != null) {
@@ -97,9 +97,9 @@ public class PainelPlataformas {
             }
         });
 
-        Button btnExibir = criarBotao("Exibir", "/imagens/visual16.png");
+        Button btnExibir = criarBotao("Exibir", "/imagens/visual.png");
 
-        Button btnExcluir = criarBotao("Excluir", "/imagens/delete16.png");
+        Button btnExcluir = criarBotao("Excluir", "/imagens/garbage.png");
         btnExcluir.setOnAction(e -> {
             Plataforma plataformaExcluir = tabelaPlataformas.getSelectionModel().getSelectedItem();
 

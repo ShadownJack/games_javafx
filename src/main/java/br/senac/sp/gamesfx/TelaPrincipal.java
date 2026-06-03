@@ -1,7 +1,9 @@
 package br.senac.sp.gamesfx;
 
+import br.senac.sp.gamesfx.ui.estudios.PainelEstudios;
 import br.senac.sp.gamesfx.ui.home.PainelHome;
 import br.senac.sp.gamesfx.ui.jogos.PainelJogos;
+import br.senac.sp.gamesfx.ui.plataformas.PainelPlataformas;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -27,6 +29,13 @@ public class TelaPrincipal extends Application {
         raiz.setStyle("-fx-background-color: #8aa1ca");
         painelLateral.setPadding(new Insets(10));
 
+        // Botão PainelHome
+        Button  btnHome = criarBotaoMenu("Home");
+        btnHome.setOnAction(click ->{
+            PainelHome painelHome = new PainelHome();
+            raiz.setCenter(painelHome.criarPainelHome());
+        } );
+
         // Botão PainelJogos
         Button btnJogos = criarBotaoMenu("Jogos");
         btnJogos.setOnAction(click -> {
@@ -35,14 +44,19 @@ public class TelaPrincipal extends Application {
         } );
 
         Button btnPlataformas = criarBotaoMenu("Plataforma");
-        Button btnEstudio = criarBotaoMenu("Estudios");
-        Button  btnHome = criarBotaoMenu("Home");
+        btnPlataformas.setOnAction(click -> {
+            PainelPlataformas painelPlataforma = new PainelPlataformas(stage);
+            raiz.setCenter(painelPlataforma.criarPainelPlataformas());
+        });
 
-        // Botão PainelHome
-        btnHome.setOnAction(click ->{
-            PainelHome painelHome = new PainelHome();
-            raiz.setCenter(painelHome.criarPainelHome());
-        } );
+        Button btnEstudio = criarBotaoMenu("Estudios");
+        btnEstudio.setOnAction(event -> {
+            PainelEstudios painelEstudios = new PainelEstudios(stage);
+            raiz.setCenter(painelEstudios.criarPainelEstudios());
+        });
+
+
+
 
         aplicarEfeitoHover(btnHome, btnJogos, btnPlataformas, btnEstudio);
         painelLateral.getChildren().addAll(

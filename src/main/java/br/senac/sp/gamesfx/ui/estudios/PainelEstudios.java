@@ -75,14 +75,14 @@ public class PainelEstudios {
         painelBotoes.setPadding(new Insets(20, 0, 0, 0));
         painelBotoes.setAlignment(Pos.BASELINE_RIGHT);
 
-        Button btnAdicionar = criarBotao("Adicionar", "/imagens/add16.png");
+        Button btnAdicionar = criarBotao("Adicionar", "/imagens/save-game.png");
         btnAdicionar.setOnAction(e -> {
             TelaEstudio telaEstudio = new TelaEstudio();
             telaEstudio.criarTela(stage);
             tabelaEstudios.setItems(repository.getEstudios());
         });
 
-        Button btnEditar = criarBotao("Editar", "/imagens/edit16.png");
+        Button btnEditar = criarBotao("Editar", "/imagens/pencil.png");
         btnEditar.setOnAction(e -> {
             Estudio estudioEditar = tabelaEstudios.getSelectionModel().getSelectedItem();
             if (estudioEditar != null) {
@@ -97,9 +97,9 @@ public class PainelEstudios {
             }
         });
 
-        Button btnExibir = criarBotao("Exibir", "/imagens/visual16.png");
+        Button btnExibir = criarBotao("Exibir", "/imagens/visual.png");
 
-        Button btnExcluir = criarBotao("Excluir", "/imagens/delete16.png");
+        Button btnExcluir = criarBotao("Excluir", "/imagens/garbage.png");
         btnExcluir.setOnAction(e -> {
             Estudio estudioExcluir = tabelaEstudios.getSelectionModel().getSelectedItem();
 

@@ -109,9 +109,9 @@ public class EstudioRepository {
         try {
             PreparedStatement stm = ConexaoSQLite.getConexao().prepareStatement(sql);
 
-            stm.setString(1, estudio.getNome());
+            stm.setString(1, estudio.getTitulo());
             stm.setString(2, estudio.getPaisOrigem());
-            stm.setInt(3, estudio.getAnoFundacao());
+            stm.setString(3, estudio.getAnoFundacao().toString());
             stm.setString(4, estudio.getSite());
             stm.setInt(5, estudio.isAtivo() ? 1 : 0);
             stm.setInt(6, estudio.getId());
