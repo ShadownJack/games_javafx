@@ -23,7 +23,7 @@ public class TelaEstudio {
     private TextField tfId = new TextField();
     private TextField tfNome = new TextField();
     private TextField tfPaisOrigem = new TextField();
-    private TextField tfAnoFundacao = new TextField();
+    private DatePicker tfAnoFundacao = new DatePicker(LocalDate.now());
     private TextField tfSite = new TextField();
     private CheckBox cbAtivo = new CheckBox("Ativo");
 
@@ -36,7 +36,7 @@ public class TelaEstudio {
         tfId.setText(String.valueOf(estudio.getId()));
         tfNome.setText(estudio.getTitulo());
         tfPaisOrigem.setText(estudio.getPaisOrigem());
-        tfAnoFundacao.setText(String.valueOf(estudio.getAnoFundacao()));
+        tfAnoFundacao.setValue(estudio.getAnoFundacao());
         tfSite.setText(estudio.getSite());
         cbAtivo.setSelected(estudio.isAtivo());
     }
@@ -140,10 +140,9 @@ public class TelaEstudio {
         }
 
         btnSalvar.setOnAction(evento -> {
-
-            // MELHORIA: Validação de campos obrigatórios (site é opcional)
+            // 1. Validação de campos obrigatórios
             if (tfNome.getText().isEmpty() || tfPaisOrigem.getText().isEmpty()
-                    || tfAnoFundacao.getText().isEmpty()) {
+                    || tfAnoFundacao.getValue() == null){
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
                 alerta.setTitle("Campos obrigatórios");
                 alerta.setHeaderText("Nome, País de Origem e Ano de Fundação são obrigatórios.");
@@ -151,22 +150,15 @@ public class TelaEstudio {
                 return;
             }
 
+            // 2. Criação do objeto e população dos dados
             Estudio estudio = new Estudio();
             estudio.setTitulo(tfNome.getText());
             estudio.setPaisOrigem(tfPaisOrigem.getText());
+
+            estudio.setAnoFundacao(tfAnoFundacao.getValue());
+
             estudio.setSite(tfSite.getText());
             estudio.setAtivo(cbAtivo.isSelected());
-
-            try {
-                estudio.setAnoFundacao(LocalDate.parse(tfAnoFundacao.getText()));
-            } catch (NumberFormatException e) {
-                Alert alerta = new Alert(Alert.AlertType.ERROR);
-                alerta.setTitle("Valor incorreto");
-                alerta.setHeaderText("O ano de fundação deve conter apenas números!");
-                alerta.showAndWait();
-                tfAnoFundacao.requestFocus();
-                return;
-            }
 
             EstudioRepository repository = new EstudioRepository();
 
@@ -189,6 +181,7 @@ public class TelaEstudio {
             } else {
                 // EDIÇÃO
                 estudio.setId(Integer.parseInt(tfId.getText()));
+
                 repository.editar(estudio);
 
                 Alert mensagemEditar = new Alert(Alert.AlertType.INFORMATION);
@@ -221,7 +214,7 @@ public class TelaEstudio {
         tfId.clear();
         tfNome.clear();
         tfPaisOrigem.clear();
-        tfAnoFundacao.clear();
+        tfAnoFundacao.setValue(LocalDate.now());
         tfSite.clear();
         cbAtivo.setSelected(true);
         tfNome.requestFocus();

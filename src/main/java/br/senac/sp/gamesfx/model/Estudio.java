@@ -9,6 +9,7 @@ public class Estudio {
     private LocalDate anoFundacao;
     private String site;
     private boolean ativo;
+    private int idFabricante;
 
     public Estudio() {
     }
@@ -37,6 +38,10 @@ public class Estudio {
     public void setAnoFundacao(LocalDate anoFundacao) {
         this.anoFundacao = anoFundacao;
     }
+
+    public int getIdFabricante() { return idFabricante; }
+
+    public void setIdFabricante(int idFabricante) { this.idFabricante = idFabricante; }
 
     public boolean isAtivo() {
         return ativo;
@@ -70,7 +75,8 @@ public class Estudio {
         this.titulo = titulo;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return this.getTitulo();
+    }
 }

@@ -44,7 +44,7 @@ public class PainelPlataformas {
         colunaId.setPrefWidth(50);
 
         TableColumn<Plataforma, String> colunaNome = new TableColumn<>("NOME");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colunaNome.setPrefWidth(200);
 
         TableColumn<Plataforma, String> colunaFabricante = new TableColumn<>("FABRICANTE");

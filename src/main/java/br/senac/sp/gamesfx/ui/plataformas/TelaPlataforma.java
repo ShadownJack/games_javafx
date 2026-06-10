@@ -1,6 +1,7 @@
 package br.senac.sp.gamesfx.ui.plataformas;
 
 import br.senac.sp.gamesfx.data.repository.PlataformaRepository;
+import br.senac.sp.gamesfx.model.Fabricante;
 import br.senac.sp.gamesfx.model.Plataforma;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -22,8 +23,8 @@ public class TelaPlataforma {
 
     private TextField tfId = new TextField();
     private TextField tfNome = new TextField();
-    private TextField tfFabricante = new TextField();
-    private TextField tfAnoLancamento = new TextField();
+    private ComboBox<Fabricante> cbFabricante = new ComboBox<>(); // Agora lida com objetos Fabricante
+    private DatePicker tfAnoLancamento = new DatePicker(LocalDate.now());
     private TextField tfGeracao = new TextField();
     private CheckBox cbAtiva = new CheckBox("Ativa");
 
@@ -35,8 +36,20 @@ public class TelaPlataforma {
 
         tfId.setText(String.valueOf(plataforma.getId()));
         tfNome.setText(plataforma.getTitulo());
-        tfFabricante.setText(plataforma.getFabricante());
-        tfAnoLancamento.setText(String.valueOf(plataforma.getAnoLancamento()));
+
+        // Carrega as opções no combo antes de selecionar a correta
+        PlataformaRepository repo = new PlataformaRepository();
+        cbFabricante.setItems(repo.getFabricantes());
+
+        // Seleciona a fabricante que bate com o ID vindo da plataforma
+        for (Fabricante f : cbFabricante.getItems()) {
+            if (f.getId() == plataforma.getIdFabricante()) {
+                cbFabricante.getSelectionModel().select(f);
+                break;
+            }
+        }
+
+        tfAnoLancamento.setValue(plataforma.getAnoLancamento());
         tfGeracao.setText(String.valueOf(plataforma.getGeracao()));
         cbAtiva.setSelected(plataforma.isAtivo());
     }
@@ -90,6 +103,12 @@ public class TelaPlataforma {
         VBox formulario = new VBox();
         formulario.setPadding(new Insets(20));
 
+        // Só carrega as fabricantes se já não tiverem sido carregadas no construtor de edição
+        if (cbFabricante.getItems().isEmpty()) {
+            PlataformaRepository repo = new PlataformaRepository();
+            cbFabricante.setItems(repo.getFabricantes());
+        }
+
         GridPane grid = new GridPane();
         grid.setHgap(15);
         grid.setVgap(15);
@@ -100,16 +119,18 @@ public class TelaPlataforma {
         tfId.setDisable(true);
 
         tfNome.setPromptText("Ex. PlayStation 5");
-        tfFabricante.setPromptText("Ex. Sony");
+        cbFabricante.setPromptText("Selecione...");
         tfAnoLancamento.setPromptText("Ex. 2020");
         tfGeracao.setPromptText("Ex. 9");
+
+        cbFabricante.setMaxWidth(Double.MAX_VALUE);
 
         grid.add(new Label("ID:"), 0, 0);
         grid.add(tfId, 1, 0);
         grid.add(new Label("Nome:"), 0, 1);
         grid.add(tfNome, 1, 1);
         grid.add(new Label("Fabricante:"), 0, 2);
-        grid.add(tfFabricante, 1, 2);
+        grid.add(cbFabricante, 1, 2);
         grid.add(new Label("Ano de Lançamento:"), 0, 3);
         grid.add(tfAnoLancamento, 1, 3);
         grid.add(new Label("Geração:"), 0, 4);
@@ -141,9 +162,8 @@ public class TelaPlataforma {
 
         btnSalvar.setOnAction(evento -> {
 
-            // MELHORIA: Validação de campos obrigatórios
-            if (tfNome.getText().isEmpty() || tfFabricante.getText().isEmpty()
-                    || tfAnoLancamento.getText().isEmpty() || tfGeracao.getText().isEmpty()) {
+            if (tfNome.getText().isEmpty() || cbFabricante.getSelectionModel().isEmpty()
+                    || tfAnoLancamento.getValue() == null || tfGeracao.getText().isEmpty()) {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
                 alerta.setTitle("Campos obrigatórios");
                 alerta.setHeaderText("Preencha todos os campos antes de salvar.");
@@ -153,19 +173,14 @@ public class TelaPlataforma {
 
             Plataforma plataforma = new Plataforma();
             plataforma.setTitulo(tfNome.getText());
-            plataforma.setFabricante(tfFabricante.getText());
-            plataforma.setAtivo(cbAtiva.isSelected());
 
-            try {
-                plataforma.setAnoLancamento(LocalDate.parse(tfAnoLancamento.getText()));
-            } catch (NumberFormatException e) {
-                Alert alerta = new Alert(Alert.AlertType.ERROR);
-                alerta.setTitle("Valor incorreto");
-                alerta.setHeaderText("O ano de lançamento deve conter apenas números!");
-                alerta.showAndWait();
-                tfAnoLancamento.requestFocus();
-                return;
-            }
+            // CORREÇÃO: Pegamos o objeto Fabricante selecionado e injetamos o ID dele e o nome textual
+            Fabricante fabSelecionada = cbFabricante.getSelectionModel().getSelectedItem();
+            plataforma.setIdFabricante(fabSelecionada.getId());
+            plataforma.setFabricante(fabSelecionada.getNome()); // Mantém preenchido para a tabela
+
+            plataforma.setAnoLancamento(tfAnoLancamento.getValue());
+            plataforma.setAtivo(cbAtiva.isSelected());
 
             try {
                 plataforma.setGeracao(Integer.parseInt(tfGeracao.getText()));
@@ -184,12 +199,12 @@ public class TelaPlataforma {
                 // NOVO CADASTRO
                 repository.salvar(plataforma);
 
-                Alert mensagemSalvar = new Alert(Alert.AlertType.CONFIRMATION);
-                mensagemSalvar.setTitle("Cadastro de plataforma");
-                mensagemSalvar.setHeaderText("A plataforma foi gravada com sucesso!");
-                mensagemSalvar.setContentText("Deseja cadastrar outra plataforma?");
+                Alert mensajeSalvar = new Alert(Alert.AlertType.CONFIRMATION);
+                mensajeSalvar.setTitle("Cadastro de plataforma");
+                mensajeSalvar.setHeaderText("A plataforma foi gravada com sucesso!");
+                mensajeSalvar.setContentText("Deseja cadastrar outra plataforma?");
 
-                Optional<ButtonType> escolha = mensagemSalvar.showAndWait();
+                Optional<ButtonType> escolha = mensajeSalvar.showAndWait();
                 if (escolha.get() == ButtonType.OK) {
                     limparCampos();
                 } else {
@@ -230,8 +245,8 @@ public class TelaPlataforma {
     private void limparCampos() {
         tfId.clear();
         tfNome.clear();
-        tfFabricante.clear();
-        tfAnoLancamento.clear();
+        cbFabricante.getSelectionModel().clearSelection();
+        tfAnoLancamento.setValue(LocalDate.now());
         tfGeracao.clear();
         cbAtiva.setSelected(true);
         tfNome.requestFocus();

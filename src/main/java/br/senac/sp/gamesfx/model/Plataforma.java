@@ -9,6 +9,7 @@ public class Plataforma {
     private LocalDate anoLancamento;
     private int geracao;
     private boolean ativo;
+    private int idFabricante;
 
     public Plataforma() {
     }
@@ -21,6 +22,9 @@ public class Plataforma {
         this.geracao = geracao;
         this.ativo = ativo;
     }
+
+    public int getIdFabricante() { return idFabricante; }
+    public void setIdFabricante(int idFabricante) { this.idFabricante = idFabricante; }
 
     public int getId() {
         return id;
@@ -41,8 +45,7 @@ public class Plataforma {
     public String getFabricante() {
         return fabricante;
     }
-
-    public void setFabricante(String faabricante) {
+    public void setFabricante(String fabricante) {
         this.fabricante = fabricante;
     }
 
@@ -69,4 +72,11 @@ public class Plataforma {
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
     }
+
+    @Override
+    public String toString() {
+        return this.getTitulo();
+    }
+
 }
+

@@ -14,6 +14,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class PainelEstudios {
@@ -43,15 +44,15 @@ public class PainelEstudios {
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colunaId.setPrefWidth(50);
 
-        TableColumn<Estudio, String> colunaNome = new TableColumn<>("NOME");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
+        TableColumn<Estudio, String> colunaNome = new TableColumn<>("TITULO");
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colunaNome.setPrefWidth(200);
 
         TableColumn<Estudio, String> colunaPais = new TableColumn<>("PAÍS DE ORIGEM");
         colunaPais.setCellValueFactory(new PropertyValueFactory<>("paisOrigem"));
         colunaPais.setPrefWidth(150);
 
-        TableColumn<Estudio, Integer> colunaAno = new TableColumn<>("ANO FUNDAÇÃO");
+        TableColumn<Estudio, LocalDate> colunaAno = new TableColumn<>("ANO FUNDAÇÃO");
         colunaAno.setCellValueFactory(new PropertyValueFactory<>("anoFundacao"));
         colunaAno.setPrefWidth(120);
 

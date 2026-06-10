@@ -29,8 +29,8 @@ public class TelaJogo {
     private TextField tfId = new TextField();
     private TextField tfTitulo = new TextField();
     private TextField tfValor = new TextField();
-    private ComboBox<String> comboPlataforma = new ComboBox<>();
-    private ComboBox<String> comboEstudio = new ComboBox<>();
+    private ComboBox<Plataforma> comboPlataforma = new ComboBox<>();
+    private ComboBox<Estudio> comboEstudio = new ComboBox<>();
     private DatePicker dpDataLancamento = new DatePicker(LocalDate.now());
     private CheckBox cbFinalizado = new CheckBox("Finalizado");
 
@@ -43,8 +43,29 @@ public class TelaJogo {
         tfId.setText(String.valueOf(jogo.getId()));
         tfTitulo.setText(jogo.getTitulo());
         tfValor.setText(String.valueOf(jogo.getPreco()));
-        comboPlataforma.setValue(jogo.getPlataforma());
-        comboEstudio.setValue(jogo.getEstudio());
+
+        // 1. Carrega os itens do banco para permitir a pré-seleção correta
+        PlataformaRepository plataformaRepo = new PlataformaRepository();
+        EstudioRepository estudioRepo = new EstudioRepository();
+        comboPlataforma.setItems(plataformaRepo.getPlataformas());
+        comboEstudio.setItems(estudioRepo.getEstudios());
+
+        // 2. Pré-seleciona a plataforma pelo ID gravado no jogo
+        for (Plataforma p : comboPlataforma.getItems()) {
+            if (p.getId() == jogo.getId()) {
+                comboPlataforma.getSelectionModel().select(p);
+                break;
+            }
+        }
+
+        // 3. Pré-seleciona o estúdio pelo ID gravado no jogo
+        for (Estudio e : comboEstudio.getItems()) {
+            if (e.getId() == jogo.getId()) {
+                comboEstudio.getSelectionModel().select(e);
+                break;
+            }
+        }
+
         dpDataLancamento.setValue(jogo.getDataLancamento());
         cbFinalizado.setSelected(jogo.isFinalizado());
     }
@@ -111,31 +132,23 @@ public class TelaJogo {
         tfTitulo.setPromptText("Ex. Super Mario World");
         tfValor.setPromptText("Ex. 199.90");
 
-        // 1. Instancia os repositórios para buscar os dados reais do banco
-        PlataformaRepository plataformaRepo = new PlataformaRepository();
-        EstudioRepository estudioRepo = new EstudioRepository();
-
-        // 2. Criamos listas de Strings vazias para os ComboBoxes
-        ObservableList<String> plataformasTexto = FXCollections.observableArrayList();
-        ObservableList<String> estudiosTexto = FXCollections.observableArrayList();
-
-        // 3. Varre a lista de objetos do banco e extrai APENAS os nomes (Strings)
-        for (Plataforma p : plataformaRepo.getPlataformas()) {
-            plataformasTexto.add(p.getTitulo()); // Adiciona o nome da plataforma na lista
+        // Alimentação direta com objetos do repositório (apenas se a lista estiver vazia)
+        if (comboPlataforma.getItems().isEmpty()) {
+            PlataformaRepository plataformaRepo = new PlataformaRepository();
+            comboPlataforma.setItems(plataformaRepo.getPlataformas());
         }
-
-        for (Estudio e : estudioRepo.getEstudios()) {
-            estudiosTexto.add(e.getTitulo()); // Adiciona o nome do estúdio na lista
+        if (comboEstudio.getItems().isEmpty()) {
+            EstudioRepository estudioRepo = new EstudioRepository();
+            comboEstudio.setItems(estudioRepo.getEstudios());
         }
-
-        // 4. Alimenta os ComboBoxes comuns de String com os dados dinâmicos do banco
-        comboPlataforma.setItems(plataformasTexto);
-        comboEstudio.setItems(estudiosTexto);
 
         comboPlataforma.setPromptText("Selecione...");
         comboEstudio.setPromptText("Selecione...");
 
-        // Montagem do Grid igual ao seu original
+        // Garante ajuste de tamanho completo na Grid
+        comboPlataforma.setMaxWidth(Double.MAX_VALUE);
+        comboEstudio.setMaxWidth(Double.MAX_VALUE);
+
         grid.add(new Label("ID:"), 0, 0);
         grid.add(tfId, 1, 0);
         grid.add(new Label("Título:"), 0, 1);
@@ -153,7 +166,6 @@ public class TelaJogo {
         formulario.getChildren().add(grid);
         return formulario;
     }
-
     private HBox criarPainelBotoes(Stage stage) {
         HBox painelBotoes = new HBox(15);
         painelBotoes.setPadding(new Insets(15));
@@ -174,10 +186,31 @@ public class TelaJogo {
         }
 
         btnSalvar.setOnAction(evento -> {
+            // Validação atualizada para checar se a seleção dos componentes está vazia
+            if (tfTitulo.getText().isEmpty() || comboPlataforma.getSelectionModel().isEmpty()
+                    || comboEstudio.getSelectionModel().isEmpty() || dpDataLancamento.getValue() == null) {
+                Alert alerta = new Alert(Alert.AlertType.WARNING);
+                alerta.setTitle("Campos obrigatórios");
+                alerta.setHeaderText("Preencha todos os campos obrigatórios antes de salvar.");
+                alerta.showAndWait();
+                return;
+            }
+
             Jogo jogo = new Jogo();
             jogo.setTitulo(tfTitulo.getText());
-            jogo.setPlataforma(comboPlataforma.getValue());
-            jogo.setEstudio(comboEstudio.getValue());
+
+            // CAPTURA DOS RELACIONAMENTOS: Extrai os objetos selecionados do ComboBox
+            Plataforma platSelecionada = comboPlataforma.getSelectionModel().getSelectedItem();
+            Estudio estSelecionado = comboEstudio.getSelectionModel().getSelectedItem();
+
+            // Define os IDs numéricos para a persistência correta no banco de dados relacional
+            jogo.setId(platSelecionada.getId());
+            jogo.setId(estSelecionado.getId());
+
+            // Mantém os setters de String caso seu modelo precise preencher a TableView local instantaneamente
+            jogo.setPlataforma(platSelecionada.getTitulo());
+            jogo.setEstudio(estSelecionado.getTitulo());
+
             jogo.setDataLancamento(dpDataLancamento.getValue());
             jogo.setCategoria("Jogo");
             jogo.setFinalizado(cbFinalizado.isSelected());
@@ -248,8 +281,8 @@ public class TelaJogo {
         tfId.clear();
         tfTitulo.clear();
         tfValor.clear();
-        comboPlataforma.setValue(null);
-        comboEstudio.setValue(null);
+        comboPlataforma.getSelectionModel().clearSelection();
+        comboEstudio.getSelectionModel().clearSelection();
         dpDataLancamento.setValue(LocalDate.now());
         cbFinalizado.setSelected(false);
         tfTitulo.requestFocus();
