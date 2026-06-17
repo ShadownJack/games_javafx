@@ -6,7 +6,15 @@ import br.senac.sp.gamesfx.model.Plataforma;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -17,46 +25,42 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 public class TelaPlataforma {
 
-    private TextField tfId = new TextField();
-    private TextField tfNome = new TextField();
-    private ComboBox<Fabricante> cbFabricante = new ComboBox<>(); // Agora lida com objetos Fabricante
-    private DatePicker tfAnoLancamento = new DatePicker(LocalDate.now());
-    private TextField tfGeracao = new TextField();
-    private CheckBox cbAtiva = new CheckBox("Ativa");
+    private final TextField tfId = new TextField();
+    private final TextField tfNome = new TextField();
+    private final ComboBox<Fabricante> cbFabricante = new ComboBox<>();
+    private final DatePicker dpAnoLancamento = new DatePicker(LocalDate.now());
+    private final TextField tfGeracao = new TextField();
+    private final CheckBox cbAtiva = new CheckBox("Ativa");
 
-    private String tituloTela;
+    private final String tituloTela;
 
-    // Construtor para EDIÇÃO
     public TelaPlataforma(Plataforma plataforma) {
         this.tituloTela = "Alterar Plataforma";
 
         tfId.setText(String.valueOf(plataforma.getId()));
-        tfNome.setText(plataforma.getTitulo());
+        tfNome.setText(plataforma.getNome());
 
-        // Carrega as opções no combo antes de selecionar a correta
         PlataformaRepository repo = new PlataformaRepository();
         cbFabricante.setItems(repo.getFabricantes());
 
-        // Seleciona a fabricante que bate com o ID vindo da plataforma
         for (Fabricante f : cbFabricante.getItems()) {
-            if (f.getId() == plataforma.getIdFabricante()) {
+            if (f.getId() == plataforma.getFabricanteId()) {
                 cbFabricante.getSelectionModel().select(f);
                 break;
             }
         }
 
-        tfAnoLancamento.setValue(plataforma.getAnoLancamento());
+        dpAnoLancamento.setValue(plataforma.getAnoLancamento());
         tfGeracao.setText(String.valueOf(plataforma.getGeracao()));
         cbAtiva.setSelected(plataforma.isAtivo());
     }
 
-    // Construtor para NOVO CADASTRO
     public TelaPlataforma() {
         this.tituloTela = "Cadastro de Plataforma";
+        cbAtiva.setSelected(true);
     }
 
     public void criarTela(Stage stagePai) {
@@ -89,7 +93,7 @@ public class TelaPlataforma {
             imageView.setFitWidth(32);
             painelTitulo.getChildren().add(imageView);
         } catch (Exception e) {
-            System.err.println("Aviso: Imagem do título não encontrada.");
+            System.err.println("Aviso: Imagem do titulo nao encontrada.");
         }
 
         Label lblTitulo = new Label(this.tituloTela);
@@ -103,7 +107,6 @@ public class TelaPlataforma {
         VBox formulario = new VBox();
         formulario.setPadding(new Insets(20));
 
-        // Só carrega as fabricantes se já não tiverem sido carregadas no construtor de edição
         if (cbFabricante.getItems().isEmpty()) {
             PlataformaRepository repo = new PlataformaRepository();
             cbFabricante.setItems(repo.getFabricantes());
@@ -120,7 +123,7 @@ public class TelaPlataforma {
 
         tfNome.setPromptText("Ex. PlayStation 5");
         cbFabricante.setPromptText("Selecione...");
-        tfAnoLancamento.setPromptText("Ex. 2020");
+        dpAnoLancamento.setPromptText("Ex. 2020");
         tfGeracao.setPromptText("Ex. 9");
 
         cbFabricante.setMaxWidth(Double.MAX_VALUE);
@@ -131,9 +134,9 @@ public class TelaPlataforma {
         grid.add(tfNome, 1, 1);
         grid.add(new Label("Fabricante:"), 0, 2);
         grid.add(cbFabricante, 1, 2);
-        grid.add(new Label("Ano de Lançamento:"), 0, 3);
-        grid.add(tfAnoLancamento, 1, 3);
-        grid.add(new Label("Geração:"), 0, 4);
+        grid.add(new Label("Ano de Lancamento:"), 0, 3);
+        grid.add(dpAnoLancamento, 1, 3);
+        grid.add(new Label("Geracao:"), 0, 4);
         grid.add(tfGeracao, 1, 4);
         grid.add(cbAtiva, 1, 5);
 
@@ -157,29 +160,28 @@ public class TelaPlataforma {
             ivSalvar.setFitWidth(20);
             btnSalvar.setGraphic(ivSalvar);
         } catch (Exception e) {
-            System.err.println("Imagem save.png não encontrada.");
+            System.err.println("Imagem save.png nao encontrada.");
         }
 
         btnSalvar.setOnAction(evento -> {
 
-            if (tfNome.getText().isEmpty() || cbFabricante.getSelectionModel().isEmpty()
-                    || tfAnoLancamento.getValue() == null || tfGeracao.getText().isEmpty()) {
+            if (tfNome.getText().isBlank() || cbFabricante.getSelectionModel().isEmpty()
+                    || dpAnoLancamento.getValue() == null || tfGeracao.getText().isBlank()) {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Campos obrigatórios");
+                alerta.setTitle("Campos obrigatorios");
                 alerta.setHeaderText("Preencha todos os campos antes de salvar.");
                 alerta.showAndWait();
                 return;
             }
 
             Plataforma plataforma = new Plataforma();
-            plataforma.setTitulo(tfNome.getText());
+            plataforma.setNome(tfNome.getText());
 
-            // CORREÇÃO: Pegamos o objeto Fabricante selecionado e injetamos o ID dele e o nome textual
             Fabricante fabSelecionada = cbFabricante.getSelectionModel().getSelectedItem();
-            plataforma.setIdFabricante(fabSelecionada.getId());
-            plataforma.setFabricante(fabSelecionada.getNome()); // Mantém preenchido para a tabela
+            plataforma.setFabricanteId(fabSelecionada.getId());
+            plataforma.setFabricante(fabSelecionada.getNome());
 
-            plataforma.setAnoLancamento(tfAnoLancamento.getValue());
+            plataforma.setAnoLancamento(dpAnoLancamento.getValue());
             plataforma.setAtivo(cbAtiva.isSelected());
 
             try {
@@ -187,7 +189,7 @@ public class TelaPlataforma {
             } catch (NumberFormatException e) {
                 Alert alerta = new Alert(Alert.AlertType.ERROR);
                 alerta.setTitle("Valor incorreto");
-                alerta.setHeaderText("A geração deve conter apenas números!");
+                alerta.setHeaderText("A geracao deve conter apenas numeros.");
                 alerta.showAndWait();
                 tfGeracao.requestFocus();
                 return;
@@ -195,30 +197,46 @@ public class TelaPlataforma {
 
             PlataformaRepository repository = new PlataformaRepository();
 
-            if (tfId.getText() == null || tfId.getText().equals("")) {
-                // NOVO CADASTRO
-                repository.salvar(plataforma);
+            if (tfId.getText().isBlank()) {
+                boolean sucesso = repository.salvar(plataforma);
+                if (!sucesso) {
+                    Alert erro = new Alert(Alert.AlertType.ERROR);
+                    erro.setTitle("Erro");
+                    erro.setHeaderText("Nao foi possivel salvar a plataforma.");
+                    erro.showAndWait();
+                    return;
+                }
 
-                Alert mensajeSalvar = new Alert(Alert.AlertType.CONFIRMATION);
-                mensajeSalvar.setTitle("Cadastro de plataforma");
-                mensajeSalvar.setHeaderText("A plataforma foi gravada com sucesso!");
-                mensajeSalvar.setContentText("Deseja cadastrar outra plataforma?");
+                Alert mensagemSalvar = new Alert(Alert.AlertType.CONFIRMATION);
+                mensagemSalvar.setTitle("Cadastro de plataforma");
+                mensagemSalvar.setHeaderText("A plataforma foi gravada com sucesso.");
+                mensagemSalvar.setContentText("Deseja cadastrar outra plataforma?");
 
-                Optional<ButtonType> escolha = mensajeSalvar.showAndWait();
-                if (escolha.get() == ButtonType.OK) {
+                boolean cadastrarOutra = mensagemSalvar.showAndWait()
+                        .filter(botao -> botao == ButtonType.OK)
+                        .isPresent();
+
+                if (cadastrarOutra) {
                     limparCampos();
                 } else {
                     stage.close();
                 }
 
             } else {
-                // EDIÇÃO
                 plataforma.setId(Integer.parseInt(tfId.getText()));
-                repository.editar(plataforma);
+                boolean sucesso = repository.editar(plataforma);
+
+                if (!sucesso) {
+                    Alert erro = new Alert(Alert.AlertType.ERROR);
+                    erro.setTitle("Erro");
+                    erro.setHeaderText("Nao foi possivel atualizar a plataforma.");
+                    erro.showAndWait();
+                    return;
+                }
 
                 Alert mensagemEditar = new Alert(Alert.AlertType.INFORMATION);
-                mensagemEditar.setTitle("Atualização de plataforma");
-                mensagemEditar.setHeaderText("A plataforma foi atualizada com sucesso!");
+                mensagemEditar.setTitle("Atualizacao de plataforma");
+                mensagemEditar.setHeaderText("A plataforma foi atualizada com sucesso.");
                 mensagemEditar.showAndWait();
 
                 stage.close();
@@ -233,7 +251,7 @@ public class TelaPlataforma {
             ivCancelar.setFitWidth(20);
             btnCancelar.setGraphic(ivCancelar);
         } catch (Exception e) {
-            System.err.println("Imagem cross-button.png não encontrada.");
+            System.err.println("Imagem cross-button.png nao encontrada.");
         }
 
         btnCancelar.setOnAction(evento -> stage.close());
@@ -246,7 +264,7 @@ public class TelaPlataforma {
         tfId.clear();
         tfNome.clear();
         cbFabricante.getSelectionModel().clearSelection();
-        tfAnoLancamento.setValue(LocalDate.now());
+        dpAnoLancamento.setValue(LocalDate.now());
         tfGeracao.clear();
         cbAtiva.setSelected(true);
         tfNome.requestFocus();

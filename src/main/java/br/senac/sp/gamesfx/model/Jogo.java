@@ -4,54 +4,64 @@ import java.time.LocalDate;
 
 public class Jogo {
 
-    // 1. Atributos (Sempre no topo para melhor leitura)
     private int id;
+    private int plataformaId;
+    private int estudioId;
     private String titulo;
-    private String plataforma;
+    private String nomePlataforma;
     private String categoria;
-    private String estudio;
+    private String nomeEstudio;
     private double preco;
     private LocalDate dataLancamento;
     private boolean finalizado;
 
-    // 2. Construtores
-
-    // Construtor Padrão (Necessário para muitos frameworks)
     public Jogo() {
     }
 
-    // Construtor Reduzido (Vindo do código do professor)
-    public Jogo(int id, String titulo, String plataforma) {
+    public Jogo(int id, String titulo, String nomePlataforma) {
         this.id = id;
         this.titulo = titulo;
-        this.plataforma = plataforma;
+        this.nomePlataforma = nomePlataforma;
     }
 
-    // Seu Construtor Completo
-    public Jogo(int id, String titulo, String plataforma, String categoria, String estudio,
+    public Jogo(int id, String titulo, String nomePlataforma, String categoria, String nomeEstudio,
                 double preco, boolean finalizado, LocalDate dataLancamento) {
         this.id = id;
         this.titulo = titulo;
-        this.plataforma = plataforma;
+        this.nomePlataforma = nomePlataforma;
         this.categoria = categoria;
-        this.estudio = estudio;
+        this.nomeEstudio = nomeEstudio;
         this.preco = preco;
         this.finalizado = finalizado;
         this.dataLancamento = dataLancamento;
     }
 
-    // 3. Métodos Customizados
     public String getFinalizadoFormatado() {
-        return this.finalizado ? "Sim" : "Não";
+        return this.finalizado ? "Sim" : "Nao";
     }
 
-    // 4. Getters e Setters
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getPlataformaId() {
+        return plataformaId;
+    }
+
+    public void setPlataformaId(int plataformaId) {
+        this.plataformaId = plataformaId;
+    }
+
+    public int getEstudioId() {
+        return estudioId;
+    }
+
+    public void setEstudioId(int estudioId) {
+        this.estudioId = estudioId;
     }
 
     public String getTitulo() {
@@ -62,12 +72,12 @@ public class Jogo {
         this.titulo = titulo;
     }
 
-    public String getPlataforma() {
-        return plataforma;
+    public String getNomePlataforma() {
+        return nomePlataforma;
     }
 
-    public void setPlataforma(String plataforma) {
-        this.plataforma = plataforma;
+    public void setNomePlataforma(String nomePlataforma) {
+        this.nomePlataforma = nomePlataforma;
     }
 
     public String getCategoria() {
@@ -78,12 +88,12 @@ public class Jogo {
         this.categoria = categoria;
     }
 
-    public String getEstudio() {
-        return estudio;
+    public String getNomeEstudio() {
+        return nomeEstudio;
     }
 
-    public void setEstudio(String estudio) {
-        this.estudio = estudio;
+    public void setNomeEstudio(String nomeEstudio) {
+        this.nomeEstudio = nomeEstudio;
     }
 
     public double getPreco() {

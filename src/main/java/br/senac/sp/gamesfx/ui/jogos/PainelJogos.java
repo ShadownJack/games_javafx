@@ -5,7 +5,14 @@ import br.senac.sp.gamesfx.model.Jogo;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,8 +26,8 @@ import java.util.Optional;
 
 public class PainelJogos {
 
-    private Stage stage;
-    private JogoRepository repository = new JogoRepository();
+    private final Stage stage;
+    private final JogoRepository repository = new JogoRepository();
 
     public PainelJogos(Stage stage) {
         this.stage = stage;
@@ -32,43 +39,39 @@ public class PainelJogos {
         painelJogos.setPadding(new Insets(5, 20, 20, 20));
         painelJogos.setStyle("-fx-background-color: #0d253e");
 
-        // Título do painel jogos
         Label lblTitulo = new Label("Listagem de Jogos");
         lblTitulo.setStyle("-fx-font-size: 24; -fx-text-fill: #ffffff; -fx-font-weight: bold");
 
-        // Linha abaixo do label
         Separator linha = new Separator();
 
-        // Tabela com a lista de jogos
         TableView<Jogo> tabelaJogos = new TableView<>();
         VBox.setVgrow(tabelaJogos, Priority.ALWAYS);
 
-        // Criar colunas da tabela
         TableColumn<Jogo, Integer> colunaId = new TableColumn<>("ID");
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colunaId.setPrefWidth(50);
 
-        TableColumn<Jogo, String> colunaTitulo = new TableColumn<>("TÍTULO");
+        TableColumn<Jogo, String> colunaTitulo = new TableColumn<>("TITULO");
         colunaTitulo.setCellValueFactory(new PropertyValueFactory<>("titulo"));
         colunaTitulo.setPrefWidth(180);
 
         TableColumn<Jogo, String> colunaPlataforma = new TableColumn<>("PLATAFORMA");
-        colunaPlataforma.setCellValueFactory(new PropertyValueFactory<>("plataforma"));
+        colunaPlataforma.setCellValueFactory(new PropertyValueFactory<>("nomePlataforma"));
         colunaPlataforma.setPrefWidth(120);
 
-        TableColumn<Jogo, String> colunaEstudio = new TableColumn<>("ESTÚDIO");
-        colunaEstudio.setCellValueFactory(new PropertyValueFactory<>("estudio"));
+        TableColumn<Jogo, String> colunaEstudio = new TableColumn<>("ESTUDIO");
+        colunaEstudio.setCellValueFactory(new PropertyValueFactory<>("nomeEstudio"));
         colunaEstudio.setPrefWidth(100);
 
         TableColumn<Jogo, String> colunaCategoria = new TableColumn<>("CATEGORIA");
         colunaCategoria.setCellValueFactory(new PropertyValueFactory<>("categoria"));
         colunaCategoria.setPrefWidth(90);
 
-        TableColumn<Jogo, Double> colunaPreco = new TableColumn<>("PREÇO");
+        TableColumn<Jogo, Double> colunaPreco = new TableColumn<>("PRECO");
         colunaPreco.setCellValueFactory(new PropertyValueFactory<>("preco"));
         colunaPreco.setPrefWidth(80);
 
-        TableColumn<Jogo, String> colunaDataLancamento = new TableColumn<>("LANÇAMENTO");
+        TableColumn<Jogo, String> colunaDataLancamento = new TableColumn<>("LANCAMENTO");
         colunaDataLancamento.setCellValueFactory(cellData -> {
             DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String dataFormatada = cellData.getValue().getDataLancamento().format(formatador);
@@ -82,21 +85,17 @@ public class PainelJogos {
         );
         colunaFinalizado.setPrefWidth(80);
 
-        // Adicionar as colunas na tabela
         tabelaJogos.getColumns().addAll(
                 colunaId, colunaTitulo, colunaPlataforma, colunaEstudio,
                 colunaCategoria, colunaPreco, colunaDataLancamento, colunaFinalizado
         );
 
-        // Adiciona a lista de jogos na tabela
         tabelaJogos.setItems(repository.getJogos());
 
-        // Criar o painel de botões de ação
         HBox painelBotoes = new HBox(30);
         painelBotoes.setPadding(new Insets(20, 0, 0, 0));
         painelBotoes.setAlignment(Pos.BASELINE_RIGHT);
 
-        // Criar os botões
         Button btnAdicionar = criarBotao("Adicionar", "/imagens/save-game.png");
         btnAdicionar.setOnAction(e -> {
             TelaJogo telaJogo = new TelaJogo();
@@ -113,29 +112,27 @@ public class PainelJogos {
                 tabelaJogos.setItems(repository.getJogos());
             } else {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Edição de jogo");
-                alerta.setHeaderText("Para editar um jogo, você deve selecioná-lo na lista.");
+                alerta.setTitle("Edicao de jogo");
+                alerta.setHeaderText("Para editar um jogo, selecione-o na lista.");
                 alerta.showAndWait();
             }
         });
-
-        Button btnExibir = criarBotao("Exibir", "/imagens/visual.png");
 
         Button btnExcluir = criarBotao("Excluir", "/imagens/garbage.png");
         btnExcluir.setOnAction(e -> {
             Jogo jogoExcluir = tabelaJogos.getSelectionModel().getSelectedItem();
 
             if (jogoExcluir == null) {
-                Alert alertaJogoNaoSelecionado = new Alert(Alert.AlertType.WARNING);
-                alertaJogoNaoSelecionado.setTitle("Exclusão de jogo");
-                alertaJogoNaoSelecionado.setHeaderText("Para excluir um jogo, você deve selecioná-lo na lista.");
-                alertaJogoNaoSelecionado.showAndWait();
+                Alert alerta = new Alert(Alert.AlertType.WARNING);
+                alerta.setTitle("Exclusao de jogo");
+                alerta.setHeaderText("Para excluir um jogo, selecione-o na lista.");
+                alerta.showAndWait();
                 return;
             }
 
             Alert confirmaExclusao = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmaExclusao.setTitle("Exclusão de jogo");
-            confirmaExclusao.setHeaderText("Você está prestes a excluir um jogo.");
+            confirmaExclusao.setTitle("Exclusao de jogo");
+            confirmaExclusao.setHeaderText("Voce esta prestes a excluir um jogo.");
             confirmaExclusao.setContentText("Tem certeza que deseja continuar?");
 
             Optional<ButtonType> resposta = confirmaExclusao.showAndWait();
@@ -145,9 +142,7 @@ public class PainelJogos {
             }
         });
 
-        painelBotoes.getChildren().addAll(btnAdicionar, btnEditar, btnExibir, btnExcluir);
-
-        // Adicionar os componentes no painel
+        painelBotoes.getChildren().addAll(btnAdicionar, btnEditar, btnExcluir);
         painelJogos.getChildren().addAll(lblTitulo, linha, tabelaJogos, painelBotoes);
 
         return painelJogos;

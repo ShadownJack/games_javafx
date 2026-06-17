@@ -4,19 +4,19 @@ import java.time.LocalDate;
 
 public class Estudio {
     private int id;
-    private String titulo;
+    private String nome;
     private String paisOrigem;
     private LocalDate anoFundacao;
     private String site;
     private boolean ativo;
-    private int idFabricante;
+    private int fabricanteId;
 
     public Estudio() {
     }
 
-    public Estudio(int id, String titulo, String paisOrigem, LocalDate anoFundacao, String site, boolean ativo) {
+    public Estudio(int id, String nome, String paisOrigem, LocalDate anoFundacao, String site, boolean ativo) {
         this.id = id;
-        this.titulo = titulo;
+        this.nome = nome;
         this.paisOrigem = paisOrigem;
         this.anoFundacao = anoFundacao;
         this.site = site;
@@ -39,9 +39,9 @@ public class Estudio {
         this.anoFundacao = anoFundacao;
     }
 
-    public int getIdFabricante() { return idFabricante; }
+    public int getFabricanteId() { return fabricanteId; }
 
-    public void setIdFabricante(int idFabricante) { this.idFabricante = idFabricante; }
+    public void setFabricanteId(int fabricanteId) { this.fabricanteId = fabricanteId; }
 
     public boolean isAtivo() {
         return ativo;
@@ -67,16 +67,16 @@ public class Estudio {
         this.paisOrigem = paisOrigem;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getNome() {
+        return nome;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     @Override
     public String toString() {
-        return this.getTitulo();
+        return this.getNome();
     }
 }

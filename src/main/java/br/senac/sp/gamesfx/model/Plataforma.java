@@ -4,27 +4,32 @@ import java.time.LocalDate;
 
 public class Plataforma {
     private int id;
-    private String titulo;
+    private String nome;
     private String fabricante;
     private LocalDate anoLancamento;
     private int geracao;
     private boolean ativo;
-    private int idFabricante;
+    private int fabricanteId;
 
     public Plataforma() {
     }
 
-    public Plataforma(int id, String titulo, String frabricante, LocalDate anoLancamento, int geracao, boolean ativo) {
+    public Plataforma(int id, String nome, String fabricante, LocalDate anoLancamento, int geracao, boolean ativo) {
         this.id = id;
-        this.titulo = titulo;
-        this.fabricante = frabricante;
+        this.nome = nome;
+        this.fabricante = fabricante;
         this.anoLancamento = anoLancamento;
         this.geracao = geracao;
         this.ativo = ativo;
     }
 
-    public int getIdFabricante() { return idFabricante; }
-    public void setIdFabricante(int idFabricante) { this.idFabricante = idFabricante; }
+    public int getFabricanteId() {
+        return fabricanteId;
+    }
+
+    public void setFabricanteId(int fabricanteId) {
+        this.fabricanteId = fabricanteId;
+    }
 
     public int getId() {
         return id;
@@ -34,17 +39,18 @@ public class Plataforma {
         this.id = id;
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getNome() {
+        return nome;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
     public String getFabricante() {
         return fabricante;
     }
+
     public void setFabricante(String fabricante) {
         this.fabricante = fabricante;
     }
@@ -75,8 +81,6 @@ public class Plataforma {
 
     @Override
     public String toString() {
-        return this.getTitulo();
+        return this.getNome();
     }
-
 }
-

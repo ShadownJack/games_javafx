@@ -5,7 +5,14 @@ import br.senac.sp.gamesfx.model.Plataforma;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,12 +21,13 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 public class PainelPlataformas {
 
-    private Stage stage;
-    private PlataformaRepository repository = new PlataformaRepository();
+    private final Stage stage;
+    private final PlataformaRepository repository = new PlataformaRepository();
 
     public PainelPlataformas(Stage stage) {
         this.stage = stage;
@@ -44,24 +52,30 @@ public class PainelPlataformas {
         colunaId.setPrefWidth(50);
 
         TableColumn<Plataforma, String> colunaNome = new TableColumn<>("NOME");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colunaNome.setPrefWidth(200);
 
         TableColumn<Plataforma, String> colunaFabricante = new TableColumn<>("FABRICANTE");
         colunaFabricante.setCellValueFactory(new PropertyValueFactory<>("fabricante"));
         colunaFabricante.setPrefWidth(150);
 
-        TableColumn<Plataforma, Integer> colunaAno = new TableColumn<>("ANO LANÇAMENTO");
-        colunaAno.setCellValueFactory(new PropertyValueFactory<>("anoLancamento"));
+        TableColumn<Plataforma, String> colunaAno = new TableColumn<>("ANO LANCAMENTO");
+        colunaAno.setCellValueFactory(cellData -> {
+            if (cellData.getValue().getAnoLancamento() == null) {
+                return new SimpleStringProperty("");
+            }
+            String data = cellData.getValue().getAnoLancamento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            return new SimpleStringProperty(data);
+        });
         colunaAno.setPrefWidth(130);
 
-        TableColumn<Plataforma, Integer> colunaGeracao = new TableColumn<>("GERAÇÃO");
+        TableColumn<Plataforma, Integer> colunaGeracao = new TableColumn<>("GERACAO");
         colunaGeracao.setCellValueFactory(new PropertyValueFactory<>("geracao"));
         colunaGeracao.setPrefWidth(80);
 
         TableColumn<Plataforma, String> colunaAtiva = new TableColumn<>("ATIVA");
         colunaAtiva.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().isAtivo() ? "Sim" : "Não")
+                new SimpleStringProperty(cellData.getValue().isAtivo() ? "Sim" : "Nao")
         );
         colunaAtiva.setPrefWidth(70);
 
@@ -91,13 +105,11 @@ public class PainelPlataformas {
                 tabelaPlataformas.setItems(repository.getPlataformas());
             } else {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Edição de plataforma");
-                alerta.setHeaderText("Para editar uma plataforma, você deve selecioná-la na lista.");
+                alerta.setTitle("Edicao de plataforma");
+                alerta.setHeaderText("Para editar uma plataforma, selecione-a na lista.");
                 alerta.showAndWait();
             }
         });
-
-        Button btnExibir = criarBotao("Exibir", "/imagens/visual.png");
 
         Button btnExcluir = criarBotao("Excluir", "/imagens/garbage.png");
         btnExcluir.setOnAction(e -> {
@@ -105,15 +117,15 @@ public class PainelPlataformas {
 
             if (plataformaExcluir == null) {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Exclusão de plataforma");
-                alerta.setHeaderText("Para excluir uma plataforma, você deve selecioná-la na lista.");
+                alerta.setTitle("Exclusao de plataforma");
+                alerta.setHeaderText("Para excluir uma plataforma, selecione-a na lista.");
                 alerta.showAndWait();
                 return;
             }
 
             Alert confirmaExclusao = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmaExclusao.setTitle("Exclusão de plataforma");
-            confirmaExclusao.setHeaderText("Você está prestes a excluir uma plataforma.");
+            confirmaExclusao.setTitle("Exclusao de plataforma");
+            confirmaExclusao.setHeaderText("Voce esta prestes a excluir uma plataforma.");
             confirmaExclusao.setContentText("Tem certeza que deseja continuar?");
 
             Optional<ButtonType> resposta = confirmaExclusao.showAndWait();
@@ -123,7 +135,7 @@ public class PainelPlataformas {
             }
         });
 
-        painelBotoes.getChildren().addAll(btnAdicionar, btnEditar, btnExibir, btnExcluir);
+        painelBotoes.getChildren().addAll(btnAdicionar, btnEditar, btnExcluir);
         painelPlataformas.getChildren().addAll(lblTitulo, linha, tabelaPlataformas, painelBotoes);
 
         return painelPlataformas;

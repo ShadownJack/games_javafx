@@ -5,7 +5,14 @@ import br.senac.sp.gamesfx.model.Estudio;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -19,8 +26,8 @@ import java.util.Optional;
 
 public class PainelEstudios {
 
-    private Stage stage;
-    private EstudioRepository repository = new EstudioRepository();
+    private final Stage stage;
+    private final EstudioRepository repository = new EstudioRepository();
 
     public PainelEstudios(Stage stage) {
         this.stage = stage;
@@ -32,7 +39,7 @@ public class PainelEstudios {
         painelEstudios.setPadding(new Insets(5, 20, 20, 20));
         painelEstudios.setStyle("-fx-background-color: #0d253e");
 
-        Label lblTitulo = new Label("Listagem de Estúdios");
+        Label lblTitulo = new Label("Listagem de Estudios");
         lblTitulo.setStyle("-fx-font-size: 24; -fx-text-fill: #ffffff; -fx-font-weight: bold");
 
         Separator linha = new Separator();
@@ -44,15 +51,15 @@ public class PainelEstudios {
         colunaId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colunaId.setPrefWidth(50);
 
-        TableColumn<Estudio, String> colunaNome = new TableColumn<>("TITULO");
-        colunaNome.setCellValueFactory(new PropertyValueFactory<>("titulo"));
+        TableColumn<Estudio, String> colunaNome = new TableColumn<>("NOME");
+        colunaNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colunaNome.setPrefWidth(200);
 
-        TableColumn<Estudio, String> colunaPais = new TableColumn<>("PAÍS DE ORIGEM");
+        TableColumn<Estudio, String> colunaPais = new TableColumn<>("PAIS DE ORIGEM");
         colunaPais.setCellValueFactory(new PropertyValueFactory<>("paisOrigem"));
         colunaPais.setPrefWidth(150);
 
-        TableColumn<Estudio, LocalDate> colunaAno = new TableColumn<>("ANO FUNDAÇÃO");
+        TableColumn<Estudio, LocalDate> colunaAno = new TableColumn<>("ANO FUNDACAO");
         colunaAno.setCellValueFactory(new PropertyValueFactory<>("anoFundacao"));
         colunaAno.setPrefWidth(120);
 
@@ -62,7 +69,7 @@ public class PainelEstudios {
 
         TableColumn<Estudio, String> colunaAtivo = new TableColumn<>("ATIVO");
         colunaAtivo.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().isAtivo() ? "Sim" : "Não")
+                new SimpleStringProperty(cellData.getValue().isAtivo() ? "Sim" : "Nao")
         );
         colunaAtivo.setPrefWidth(70);
 
@@ -92,13 +99,11 @@ public class PainelEstudios {
                 tabelaEstudios.setItems(repository.getEstudios());
             } else {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Edição de estúdio");
-                alerta.setHeaderText("Para editar um estúdio, você deve selecioná-lo na lista.");
+                alerta.setTitle("Edicao de estudio");
+                alerta.setHeaderText("Para editar um estudio, selecione-o na lista.");
                 alerta.showAndWait();
             }
         });
-
-        Button btnExibir = criarBotao("Exibir", "/imagens/visual.png");
 
         Button btnExcluir = criarBotao("Excluir", "/imagens/garbage.png");
         btnExcluir.setOnAction(e -> {
@@ -106,15 +111,15 @@ public class PainelEstudios {
 
             if (estudioExcluir == null) {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Exclusão de estúdio");
-                alerta.setHeaderText("Para excluir um estúdio, você deve selecioná-lo na lista.");
+                alerta.setTitle("Exclusao de estudio");
+                alerta.setHeaderText("Para excluir um estudio, selecione-o na lista.");
                 alerta.showAndWait();
                 return;
             }
 
             Alert confirmaExclusao = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmaExclusao.setTitle("Exclusão de estúdio");
-            confirmaExclusao.setHeaderText("Você está prestes a excluir um estúdio.");
+            confirmaExclusao.setTitle("Exclusao de estudio");
+            confirmaExclusao.setHeaderText("Voce esta prestes a excluir um estudio.");
             confirmaExclusao.setContentText("Tem certeza que deseja continuar?");
 
             Optional<ButtonType> resposta = confirmaExclusao.showAndWait();
@@ -124,7 +129,7 @@ public class PainelEstudios {
             }
         });
 
-        painelBotoes.getChildren().addAll(btnAdicionar, btnEditar, btnExibir, btnExcluir);
+        painelBotoes.getChildren().addAll(btnAdicionar, btnEditar, btnExcluir);
         painelEstudios.getChildren().addAll(lblTitulo, linha, tabelaEstudios, painelBotoes);
 
         return painelEstudios;

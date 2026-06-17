@@ -5,9 +5,9 @@ import br.senac.sp.gamesfx.model.Jogo;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 
 public class JogoRepository {
@@ -21,9 +21,9 @@ public class JogoRepository {
 
         ObservableList<Jogo> listaJogos = FXCollections.observableArrayList();
 
-        try {
-            PreparedStatement stm = ConexaoSQLite.getConexao().prepareStatement(sql);
-            ResultSet rs = stm.executeQuery();
+        try (Connection conexao = ConexaoSQLite.getConexao();
+             PreparedStatement stm = conexao.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
 
             while (rs.next()) {
                 Jogo jogo = new Jogo();
@@ -34,114 +34,96 @@ public class JogoRepository {
                 jogo.setPreco(rs.getDouble("preco"));
                 jogo.setDataLancamento(LocalDate.parse(rs.getString("data_lancamento")));
                 jogo.setFinalizado(rs.getInt("finalizado") == 1);
-
-                jogo.setId(rs.getInt("id_estudio"));
-                jogo.setId(rs.getInt("id_plataforma"));
-
-                // Popula o modelo com o texto vindo dos relacionamentos para renderizar na tabela
-                jogo.setEstudio(rs.getString("nome_estudio"));
-                jogo.setPlataforma(rs.getString("nome_plataforma"));
+                jogo.setEstudioId(rs.getInt("id_estudio"));
+                jogo.setPlataformaId(rs.getInt("id_plataforma"));
+                jogo.setNomeEstudio(rs.getString("nome_estudio"));
+                jogo.setNomePlataforma(rs.getString("nome_plataforma"));
 
                 listaJogos.add(jogo);
             }
 
-            ConexaoSQLite.fecharConexao();
-            return listaJogos;
-
-        } catch (SQLException e) {
-            System.out.println("Ocorreu um erro na leitura dos dados do banco.");
+        } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
+
+        return listaJogos;
     }
 
-    public void salvar(Jogo jogo) {
-        String sql = "INSERT INTO tb_games (titulo, categoria, preco, data_lancamento, finalizado, id_estudio, id_plataforma) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    public boolean salvar(Jogo jogo) {
+        String sql = "INSERT INTO tb_games (titulo, categoria, preco, data_lancamento, finalizado, id_estudio, id_plataforma) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try {
-            PreparedStatement stm = ConexaoSQLite.getConexao().prepareStatement(sql);
+        try (Connection conexao = ConexaoSQLite.getConexao();
+             PreparedStatement stm = conexao.prepareStatement(sql)) {
 
             stm.setString(1, jogo.getTitulo());
             stm.setString(2, jogo.getCategoria());
             stm.setDouble(3, jogo.getPreco());
             stm.setString(4, jogo.getDataLancamento().toString());
             stm.setInt(5, jogo.isFinalizado() ? 1 : 0);
+            stm.setInt(6, jogo.getEstudioId());
+            stm.setInt(7, jogo.getPlataformaId());
 
-            stm.setInt(6, jogo.getId());
-            stm.setInt(7, jogo.getId());
+            return stm.executeUpdate() > 0;
 
-            stm.executeUpdate();
-
-            ConexaoSQLite.fecharConexao();
-
-        } catch (SQLException e) {
-            System.out.println("Ocorreu um erro na gravação.");
+        } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    public void editar(Jogo jogo) {
-        String sql = "UPDATE tb_games SET " +
-                "titulo = ?, " +
-                "categoria = ?, " +
-                "preco = ?, " +
-                "data_lancamento = ?, " +
-                "finalizado = ?, " +
-                "id_estudio = ?, " +
-                "id_plataforma = ? " +
-                "WHERE id = ?";
+    public boolean editar(Jogo jogo) {
+        String sql = "UPDATE tb_games SET titulo = ?, categoria = ?, preco = ?, data_lancamento = ?, finalizado = ?, id_estudio = ?, id_plataforma = ? WHERE id = ?";
 
-        try {
-            PreparedStatement stm = ConexaoSQLite.getConexao().prepareStatement(sql);
+        try (Connection conexao = ConexaoSQLite.getConexao();
+             PreparedStatement stm = conexao.prepareStatement(sql)) {
+
             stm.setString(1, jogo.getTitulo());
             stm.setString(2, jogo.getCategoria());
             stm.setDouble(3, jogo.getPreco());
             stm.setString(4, jogo.getDataLancamento().toString());
             stm.setInt(5, jogo.isFinalizado() ? 1 : 0);
-
-            stm.setInt(6, jogo.getId());
-            stm.setInt(7, jogo.getId());
+            stm.setInt(6, jogo.getEstudioId());
+            stm.setInt(7, jogo.getPlataformaId());
             stm.setInt(8, jogo.getId());
 
-            stm.executeUpdate();
+            return stm.executeUpdate() > 0;
 
-            ConexaoSQLite.fecharConexao();
-        } catch (SQLException e) {
-            System.out.println("Ocorreu um erro na alteração do registro.");
+        } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 
-    public int getTotalJogos(){
+    public int getTotalJogos() {
         String sql = "SELECT COUNT(id) AS total_games FROM tb_games";
-        try {
-            PreparedStatement stm = ConexaoSQLite.getConexao().prepareStatement(sql);
-            ResultSet rs = stm.executeQuery();
-            rs.next();
-            int total = rs.getInt("total_games");
 
-            ConexaoSQLite.fecharConexao();
-            return total;
-        } catch (SQLException e){
+        try (Connection conexao = ConexaoSQLite.getConexao();
+             PreparedStatement stm = conexao.prepareStatement(sql);
+             ResultSet rs = stm.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("total_games");
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
-            return 0;
         }
+
+        return 0;
     }
 
-    public int excluir(int id){
+    public boolean excluir(int id) {
         String sql = "DELETE FROM tb_games WHERE id = ?";
-        try {
-            PreparedStatement stm = ConexaoSQLite.getConexao().prepareStatement(sql);
+
+        try (Connection conexao = ConexaoSQLite.getConexao();
+             PreparedStatement stm = conexao.prepareStatement(sql)) {
+
             stm.setInt(1, id);
-            int resultado = stm.executeUpdate();
+            return stm.executeUpdate() > 0;
 
-            ConexaoSQLite.fecharConexao();
-
-            return resultado;
-        } catch (SQLException e){
+        } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return false;
         }
     }
 }

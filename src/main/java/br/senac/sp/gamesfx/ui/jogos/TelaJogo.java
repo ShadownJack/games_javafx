@@ -6,12 +6,18 @@ import br.senac.sp.gamesfx.data.repository.PlataformaRepository;
 import br.senac.sp.gamesfx.model.Estudio;
 import br.senac.sp.gamesfx.model.Jogo;
 import br.senac.sp.gamesfx.model.Plataforma;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -22,21 +28,19 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 public class TelaJogo {
 
-    private TextField tfId = new TextField();
-    private TextField tfTitulo = new TextField();
-    private TextField tfValor = new TextField();
-    private ComboBox<Plataforma> comboPlataforma = new ComboBox<>();
-    private ComboBox<Estudio> comboEstudio = new ComboBox<>();
-    private DatePicker dpDataLancamento = new DatePicker(LocalDate.now());
-    private CheckBox cbFinalizado = new CheckBox("Finalizado");
+    private final TextField tfId = new TextField();
+    private final TextField tfTitulo = new TextField();
+    private final TextField tfValor = new TextField();
+    private final ComboBox<Plataforma> comboPlataforma = new ComboBox<>();
+    private final ComboBox<Estudio> comboEstudio = new ComboBox<>();
+    private final DatePicker dpDataLancamento = new DatePicker(LocalDate.now());
+    private final CheckBox cbFinalizado = new CheckBox("Finalizado");
 
-    private String tituloTela;
+    private final String tituloTela;
 
-    // Construtor para EDIÇÃO
     public TelaJogo(Jogo jogo) {
         this.tituloTela = "Alterar Jogo";
 
@@ -44,23 +48,20 @@ public class TelaJogo {
         tfTitulo.setText(jogo.getTitulo());
         tfValor.setText(String.valueOf(jogo.getPreco()));
 
-        // 1. Carrega os itens do banco para permitir a pré-seleção correta
         PlataformaRepository plataformaRepo = new PlataformaRepository();
         EstudioRepository estudioRepo = new EstudioRepository();
         comboPlataforma.setItems(plataformaRepo.getPlataformas());
         comboEstudio.setItems(estudioRepo.getEstudios());
 
-        // 2. Pré-seleciona a plataforma pelo ID gravado no jogo
         for (Plataforma p : comboPlataforma.getItems()) {
-            if (p.getId() == jogo.getId()) {
+            if (p.getId() == jogo.getPlataformaId()) {
                 comboPlataforma.getSelectionModel().select(p);
                 break;
             }
         }
 
-        // 3. Pré-seleciona o estúdio pelo ID gravado no jogo
         for (Estudio e : comboEstudio.getItems()) {
-            if (e.getId() == jogo.getId()) {
+            if (e.getId() == jogo.getEstudioId()) {
                 comboEstudio.getSelectionModel().select(e);
                 break;
             }
@@ -70,7 +71,6 @@ public class TelaJogo {
         cbFinalizado.setSelected(jogo.isFinalizado());
     }
 
-    // Construtor para NOVO CADASTRO
     public TelaJogo() {
         this.tituloTela = "Cadastro de Jogo";
     }
@@ -82,7 +82,6 @@ public class TelaJogo {
         stage.setTitle(this.tituloTela);
 
         BorderPane raiz = new BorderPane();
-
         raiz.setTop(criarPainelTitulo());
         raiz.setCenter(criarFormulario());
         raiz.setBottom(criarPainelBotoes(stage));
@@ -106,7 +105,7 @@ public class TelaJogo {
             imageView.setFitWidth(32);
             painelTitulo.getChildren().add(imageView);
         } catch (Exception e) {
-            System.err.println("Aviso: Imagem do título não encontrada.");
+            System.err.println("Aviso: Imagem do titulo nao encontrada.");
         }
 
         Label lblTitulo = new Label(this.tituloTela);
@@ -132,11 +131,11 @@ public class TelaJogo {
         tfTitulo.setPromptText("Ex. Super Mario World");
         tfValor.setPromptText("Ex. 199.90");
 
-        // Alimentação direta com objetos do repositório (apenas se a lista estiver vazia)
         if (comboPlataforma.getItems().isEmpty()) {
             PlataformaRepository plataformaRepo = new PlataformaRepository();
             comboPlataforma.setItems(plataformaRepo.getPlataformas());
         }
+
         if (comboEstudio.getItems().isEmpty()) {
             EstudioRepository estudioRepo = new EstudioRepository();
             comboEstudio.setItems(estudioRepo.getEstudios());
@@ -144,28 +143,27 @@ public class TelaJogo {
 
         comboPlataforma.setPromptText("Selecione...");
         comboEstudio.setPromptText("Selecione...");
-
-        // Garante ajuste de tamanho completo na Grid
         comboPlataforma.setMaxWidth(Double.MAX_VALUE);
         comboEstudio.setMaxWidth(Double.MAX_VALUE);
 
         grid.add(new Label("ID:"), 0, 0);
         grid.add(tfId, 1, 0);
-        grid.add(new Label("Título:"), 0, 1);
+        grid.add(new Label("Titulo:"), 0, 1);
         grid.add(tfTitulo, 1, 1);
         grid.add(new Label("Plataforma:"), 0, 2);
         grid.add(comboPlataforma, 1, 2);
-        grid.add(new Label("Estúdio:"), 0, 3);
+        grid.add(new Label("Estudio:"), 0, 3);
         grid.add(comboEstudio, 1, 3);
         grid.add(new Label("Valor (R$):"), 0, 4);
         grid.add(tfValor, 1, 4);
-        grid.add(new Label("Lançamento:"), 0, 5);
+        grid.add(new Label("Lancamento:"), 0, 5);
         grid.add(dpDataLancamento, 1, 5);
         grid.add(cbFinalizado, 1, 6);
 
         formulario.getChildren().add(grid);
         return formulario;
     }
+
     private HBox criarPainelBotoes(Stage stage) {
         HBox painelBotoes = new HBox(15);
         painelBotoes.setPadding(new Insets(15));
@@ -182,35 +180,35 @@ public class TelaJogo {
             ivSalvar.setFitWidth(20);
             btnSalvar.setGraphic(ivSalvar);
         } catch (Exception e) {
-            System.err.println("Imagem save.png não encontrada.");
+            System.err.println("Imagem save.png nao encontrada.");
         }
 
         btnSalvar.setOnAction(evento -> {
-            // Validação atualizada para checar se a seleção dos componentes está vazia
-            if (tfTitulo.getText().isEmpty() || comboPlataforma.getSelectionModel().isEmpty()
-                    || comboEstudio.getSelectionModel().isEmpty() || dpDataLancamento.getValue() == null) {
+            if (tfTitulo.getText().isBlank() || tfValor.getText().isBlank()
+                    || comboPlataforma.getSelectionModel().isEmpty()
+                    || comboEstudio.getSelectionModel().isEmpty()
+                    || dpDataLancamento.getValue() == null) {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Campos obrigatórios");
-                alerta.setHeaderText("Preencha todos os campos obrigatórios antes de salvar.");
+                alerta.setTitle("Campos obrigatorios");
+                alerta.setHeaderText("Preencha todos os campos obrigatorios antes de salvar.");
                 alerta.showAndWait();
                 return;
             }
 
             Jogo jogo = new Jogo();
+            if (!tfId.getText().isBlank()) {
+                jogo.setId(Integer.parseInt(tfId.getText()));
+            }
+
             jogo.setTitulo(tfTitulo.getText());
 
-            // CAPTURA DOS RELACIONAMENTOS: Extrai os objetos selecionados do ComboBox
-            Plataforma platSelecionada = comboPlataforma.getSelectionModel().getSelectedItem();
-            Estudio estSelecionado = comboEstudio.getSelectionModel().getSelectedItem();
+            Plataforma plataformaSelecionada = comboPlataforma.getSelectionModel().getSelectedItem();
+            Estudio estudioSelecionado = comboEstudio.getSelectionModel().getSelectedItem();
 
-            // Define os IDs numéricos para a persistência correta no banco de dados relacional
-            jogo.setId(platSelecionada.getId());
-            jogo.setId(estSelecionado.getId());
-
-            // Mantém os setters de String caso seu modelo precise preencher a TableView local instantaneamente
-            jogo.setPlataforma(platSelecionada.getTitulo());
-            jogo.setEstudio(estSelecionado.getTitulo());
-
+            jogo.setPlataformaId(plataformaSelecionada.getId());
+            jogo.setEstudioId(estudioSelecionado.getId());
+            jogo.setNomePlataforma(plataformaSelecionada.getNome());
+            jogo.setNomeEstudio(estudioSelecionado.getNome());
             jogo.setDataLancamento(dpDataLancamento.getValue());
             jogo.setCategoria("Jogo");
             jogo.setFinalizado(cbFinalizado.isSelected());
@@ -221,7 +219,7 @@ public class TelaJogo {
             } catch (NumberFormatException erro) {
                 Alert valorIncorreto = new Alert(Alert.AlertType.ERROR);
                 valorIncorreto.setTitle("Valor incorreto");
-                valorIncorreto.setHeaderText("O valor digitado deve conter apenas números!\nUtilize ponto ou vírgula como separador de decimal.");
+                valorIncorreto.setHeaderText("O valor deve conter apenas numeros.");
                 valorIncorreto.showAndWait();
                 tfValor.requestFocus();
                 return;
@@ -229,31 +227,30 @@ public class TelaJogo {
 
             JogoRepository repository = new JogoRepository();
 
-            if (tfId.getText() == null || tfId.getText().equals("")) {
-                // NOVO CADASTRO
+            if (tfId.getText().isBlank()) {
                 repository.salvar(jogo);
 
                 Alert mensagemSalvar = new Alert(Alert.AlertType.CONFIRMATION);
                 mensagemSalvar.setTitle("Cadastro de jogo");
-                mensagemSalvar.setHeaderText("O jogo foi gravado com sucesso!");
+                mensagemSalvar.setHeaderText("O jogo foi gravado com sucesso.");
                 mensagemSalvar.setContentText("Deseja cadastrar outro jogo?");
 
-                Optional<ButtonType> escolha = mensagemSalvar.showAndWait();
+                boolean cadastrarOutro = mensagemSalvar.showAndWait()
+                        .filter(botao -> botao == ButtonType.OK)
+                        .isPresent();
 
-                if (escolha.get() == ButtonType.OK) {
+                if (cadastrarOutro) {
                     limparCampos();
                 } else {
                     stage.close();
                 }
 
             } else {
-                // EDIÇÃO
-                jogo.setId(Integer.parseInt(tfId.getText()));
                 repository.editar(jogo);
 
                 Alert mensagemEditar = new Alert(Alert.AlertType.INFORMATION);
-                mensagemEditar.setTitle("Atualização de jogo");
-                mensagemEditar.setHeaderText("O jogo foi atualizado com sucesso!");
+                mensagemEditar.setTitle("Atualizacao de jogo");
+                mensagemEditar.setHeaderText("O jogo foi atualizado com sucesso.");
                 mensagemEditar.showAndWait();
 
                 stage.close();
@@ -268,7 +265,7 @@ public class TelaJogo {
             ivCancelar.setFitWidth(20);
             btnCancelar.setGraphic(ivCancelar);
         } catch (Exception e) {
-            System.err.println("Imagem cross-button.png não encontrada.");
+            System.err.println("Imagem cross-button.png nao encontrada.");
         }
 
         btnCancelar.setOnAction(evento -> stage.close());

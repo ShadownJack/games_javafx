@@ -5,7 +5,14 @@ import br.senac.sp.gamesfx.model.Estudio;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
@@ -16,34 +23,32 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 public class TelaEstudio {
 
-    private TextField tfId = new TextField();
-    private TextField tfNome = new TextField();
-    private TextField tfPaisOrigem = new TextField();
-    private DatePicker tfAnoFundacao = new DatePicker(LocalDate.now());
-    private TextField tfSite = new TextField();
-    private CheckBox cbAtivo = new CheckBox("Ativo");
+    private final TextField tfId = new TextField();
+    private final TextField tfNome = new TextField();
+    private final TextField tfPaisOrigem = new TextField();
+    private final DatePicker tfAnoFundacao = new DatePicker(LocalDate.now());
+    private final TextField tfSite = new TextField();
+    private final CheckBox cbAtivo = new CheckBox("Ativo");
 
-    private String tituloTela;
+    private final String tituloTela;
 
-    // Construtor para EDIÇÃO
     public TelaEstudio(Estudio estudio) {
-        this.tituloTela = "Alterar Estúdio";
+        this.tituloTela = "Alterar Estudio";
 
         tfId.setText(String.valueOf(estudio.getId()));
-        tfNome.setText(estudio.getTitulo());
+        tfNome.setText(estudio.getNome());
         tfPaisOrigem.setText(estudio.getPaisOrigem());
         tfAnoFundacao.setValue(estudio.getAnoFundacao());
         tfSite.setText(estudio.getSite());
         cbAtivo.setSelected(estudio.isAtivo());
     }
 
-    // Construtor para NOVO CADASTRO
     public TelaEstudio() {
-        this.tituloTela = "Cadastro de Estúdio";
+        this.tituloTela = "Cadastro de Estudio";
+        cbAtivo.setSelected(true);
     }
 
     public void criarTela(Stage stagePai) {
@@ -76,7 +81,7 @@ public class TelaEstudio {
             imageView.setFitWidth(32);
             painelTitulo.getChildren().add(imageView);
         } catch (Exception e) {
-            System.err.println("Aviso: Imagem do título não encontrada.");
+            System.err.println("Aviso: Imagem do titulo nao encontrada.");
         }
 
         Label lblTitulo = new Label(this.tituloTela);
@@ -100,7 +105,7 @@ public class TelaEstudio {
         tfId.setDisable(true);
 
         tfNome.setPromptText("Ex. Konami");
-        tfPaisOrigem.setPromptText("Ex. Japão");
+        tfPaisOrigem.setPromptText("Ex. Japao");
         tfAnoFundacao.setPromptText("Ex. 1969");
         tfSite.setPromptText("Ex. www.konami.com");
 
@@ -108,9 +113,9 @@ public class TelaEstudio {
         grid.add(tfId, 1, 0);
         grid.add(new Label("Nome:"), 0, 1);
         grid.add(tfNome, 1, 1);
-        grid.add(new Label("País de Origem:"), 0, 2);
+        grid.add(new Label("Pais de Origem:"), 0, 2);
         grid.add(tfPaisOrigem, 1, 2);
-        grid.add(new Label("Ano de Fundação:"), 0, 3);
+        grid.add(new Label("Ano de Fundacao:"), 0, 3);
         grid.add(tfAnoFundacao, 1, 3);
         grid.add(new Label("Site:"), 0, 4);
         grid.add(tfSite, 1, 4);
@@ -127,7 +132,7 @@ public class TelaEstudio {
         painelBotoes.setStyle("-fx-background-color: #6d80b6");
 
         Button btnSalvar = new Button("Salvar");
-        btnSalvar.setTooltip(new Tooltip("Salvar dados do estúdio"));
+        btnSalvar.setTooltip(new Tooltip("Salvar dados do estudio"));
 
         try {
             Image imgSalvar = new Image(getClass().getResourceAsStream("/imagens/save.png"));
@@ -136,57 +141,67 @@ public class TelaEstudio {
             ivSalvar.setFitWidth(20);
             btnSalvar.setGraphic(ivSalvar);
         } catch (Exception e) {
-            System.err.println("Imagem save.png não encontrada.");
+            System.err.println("Imagem save.png nao encontrada.");
         }
 
         btnSalvar.setOnAction(evento -> {
-            // 1. Validação de campos obrigatórios
-            if (tfNome.getText().isEmpty() || tfPaisOrigem.getText().isEmpty()
-                    || tfAnoFundacao.getValue() == null){
+            if (tfNome.getText().isBlank() || tfPaisOrigem.getText().isBlank() || tfAnoFundacao.getValue() == null) {
                 Alert alerta = new Alert(Alert.AlertType.WARNING);
-                alerta.setTitle("Campos obrigatórios");
-                alerta.setHeaderText("Nome, País de Origem e Ano de Fundação são obrigatórios.");
+                alerta.setTitle("Campos obrigatorios");
+                alerta.setHeaderText("Nome, pais de origem e ano de fundacao sao obrigatorios.");
                 alerta.showAndWait();
                 return;
             }
 
-            // 2. Criação do objeto e população dos dados
             Estudio estudio = new Estudio();
-            estudio.setTitulo(tfNome.getText());
+            estudio.setNome(tfNome.getText());
             estudio.setPaisOrigem(tfPaisOrigem.getText());
-
             estudio.setAnoFundacao(tfAnoFundacao.getValue());
-
             estudio.setSite(tfSite.getText());
             estudio.setAtivo(cbAtivo.isSelected());
 
             EstudioRepository repository = new EstudioRepository();
 
-            if (tfId.getText() == null || tfId.getText().equals("")) {
-                // NOVO CADASTRO
-                repository.salvar(estudio);
+            if (tfId.getText().isBlank()) {
+                boolean sucesso = repository.salvar(estudio);
+                if (!sucesso) {
+                    Alert erro = new Alert(Alert.AlertType.ERROR);
+                    erro.setTitle("Erro");
+                    erro.setHeaderText("Nao foi possivel salvar o estudio.");
+                    erro.showAndWait();
+                    return;
+                }
 
                 Alert mensagemSalvar = new Alert(Alert.AlertType.CONFIRMATION);
-                mensagemSalvar.setTitle("Cadastro de estúdio");
-                mensagemSalvar.setHeaderText("O estúdio foi gravado com sucesso!");
-                mensagemSalvar.setContentText("Deseja cadastrar outro estúdio?");
+                mensagemSalvar.setTitle("Cadastro de estudio");
+                mensagemSalvar.setHeaderText("O estudio foi gravado com sucesso.");
+                mensagemSalvar.setContentText("Deseja cadastrar outro estudio?");
 
-                Optional<ButtonType> escolha = mensagemSalvar.showAndWait();
-                if (escolha.get() == ButtonType.OK) {
+                boolean cadastrarOutro = mensagemSalvar.showAndWait()
+                        .filter(botao -> botao == ButtonType.OK)
+                        .isPresent();
+
+                if (cadastrarOutro) {
                     limparCampos();
                 } else {
                     stage.close();
                 }
 
             } else {
-                // EDIÇÃO
                 estudio.setId(Integer.parseInt(tfId.getText()));
+                boolean sucesso = repository.editar(estudio);
 
-                repository.editar(estudio);
+                if (!sucesso) {
+                    Alert erro = new Alert(Alert.AlertType.ERROR);
+                    erro.setTitle("Erro");
+                    erro.setHeaderText("Nao foi possivel atualizar o estudio.");
+                    erro.showAndWait();
+                    return;
+                }
 
                 Alert mensagemEditar = new Alert(Alert.AlertType.INFORMATION);
-                mensagemEditar.setTitle("Atualização de estúdio");
-                mensagemEditar.setHeaderText("O estúdio foi atualizado com sucesso!");
+                mensagemEditar.setTitle("Atualizacao de estudio");
+                mensagemEditar.setHeaderText("O estudio foi atualizado com sucesso.");
                 mensagemEditar.showAndWait();
 
                 stage.close();
@@ -201,7 +216,7 @@ public class TelaEstudio {
             ivCancelar.setFitWidth(20);
             btnCancelar.setGraphic(ivCancelar);
         } catch (Exception e) {
-            System.err.println("Imagem cross-button.png não encontrada.");
+            System.err.println("Imagem cross-button.png nao encontrada.");
         }
 
         btnCancelar.setOnAction(evento -> stage.close());

@@ -1,38 +1,27 @@
 package br.senac.sp.gamesfx.data;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class ConexaoSQLite {
+public final class ConexaoSQLite {
 
-    private static Connection conexao;
+    private static final String DB_URL = System.getProperty("gamesfx.db.url", montarUrlPadrao());
 
-    public static Connection getConexao() {
-        // Mantido o seu caminho de banco de dados
-        String url = "jdbc:sqlite:C:/Users/david.sribeiro4/banco_de_dados/db_games.db";
-
-        try {
-            conexao = DriverManager.getConnection(url);
-            System.out.println("Conexão REALIZADA COM SUCESSO!");
-            return conexao;
-        } catch (SQLException erro) {
-            System.out.println("Ocorreu um erro durante a conexão com o banco.");
-            erro.printStackTrace();
-            return null;
-        }
+    private ConexaoSQLite() {
     }
 
-    // Atualizado com a lógica limpa e correta do professor
-    public static void fecharConexao() {
+    private static String montarUrlPadrao() {
+        Path caminho = Path.of(System.getProperty("user.home"), "banco_de_dados", "db_games.db");
+        return "jdbc:sqlite:" + caminho.toString().replace('\\', '/');
+    }
+
+    public static Connection getConexao() {
         try {
-            // ADICIONADO/CORRIGIDO: Verifica se existe uma conexão ativa antes de tentar fechar
-            if (conexao != null && !conexao.isClosed()) {
-                conexao.close();
-            }
-        } catch (SQLException e) {
-            // ADICIONADO DO PROFESSOR: Apenas imprime o rastro do erro sem estourar um RuntimeException
-            e.printStackTrace();
+            return DriverManager.getConnection(DB_URL);
+        } catch (SQLException erro) {
+            throw new IllegalStateException("Falha ao conectar no banco SQLite: " + DB_URL, erro);
         }
     }
 }
